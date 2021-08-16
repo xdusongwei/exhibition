@@ -19,6 +19,9 @@ class NavBar extends Component {
                                 <NavLink exact activeClassName='active' to='/working' className="nav-link" aria-current="page">工作节点</NavLink>
                             </li>
                             <li className="nav-item">
+                                <NavLink exact activeClassName='active' to='/node' className="nav-link" aria-current="page">节点</NavLink>
+                            </li>
+                            <li className="nav-item">
                                 <NavLink exact activeClassName='active' to='/airport' className="nav-link" aria-current="page">机场</NavLink>
                             </li>
                             <li className="nav-item">

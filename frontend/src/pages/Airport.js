@@ -36,6 +36,14 @@ class AirportPage extends Component {
             (
                 <div>
                     <div className="row mt-2">
+                        <div className="col-md-6">
+                            <div className="alert alert-success" role="alert">绿色代表链接内容被成功分析</div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="alert alert-light" role="alert">白色代表未能解析出节点</div>
+                        </div>
+                    </div>
+                    <div className="row mt-2">
                         <div className="col">
                             <div className="btn-group float-end" role="group" aria-label="pageBar">
                                 <Link type="button" className="btn btn-primary ms-2" to="/airport/add">添加</Link>
@@ -45,7 +53,7 @@ class AirportPage extends Component {
                     </div>
                     <div className="row mt-2">
                         {
-                            airportNodes.map((item) => <Airport key={item.id} item={item} />)
+                            airportNodes.map((item) => <Airport key={item.settings.id} item={item} />)
                         }
                     </div>
                 </div>

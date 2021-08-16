@@ -3,6 +3,8 @@ import {
     EXECUTABLE,
     AIRPORT,
     WORKING,
+    EXPORT,
+    NODE,
   } from '../actions'
 
 const executables = (state = [], action) => {
@@ -47,10 +49,40 @@ const workingNodes = (state = [], action) => {
     }
 }
 
+const exportNodes = (state = [], action) => {
+    switch (action.type) {
+        case EXPORT:
+            if(action.response){
+                return action.response.exportNodes
+            }
+            else{
+                return []
+            }
+        default:
+            return state
+    }
+}
+
+const customNodes = (state = [], action) => {
+    switch (action.type) {
+        case NODE:
+            if(action.response){
+                return action.response.customNodes
+            }
+            else{
+                return []
+            }
+        default:
+            return state
+    }
+}
+
 const rootReducer = combineReducers({
     executables,
     airportNodes,
     workingNodes,
+    exportNodes,
+    customNodes,
 })
 
 export default rootReducer

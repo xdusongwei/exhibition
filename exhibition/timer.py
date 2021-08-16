@@ -6,7 +6,9 @@ from exhibition.message import *
 class Timer:
     def __init__(self, queue: asyncio.Queue, data: Message | ActionEnum, interval):
         self.queue = queue
-        self.message = data if isinstance(data, Message) else Message(action=data)
+        message = data if isinstance(data, Message) else Message(action=data)
+        message.from_timer = True
+        self.message = message
         self.interval = interval
         self.task: asyncio.Task = None
         self.join_event = asyncio.Event()

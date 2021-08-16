@@ -22,6 +22,8 @@ const store = createStore(
     executables: null,
     airportNodes: null,
     workingNodes: null,
+    exportNodes: null,
+    customNodes: null,
   },
   applyMiddleware(...middleware)
 )

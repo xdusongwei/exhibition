@@ -61,6 +61,15 @@ class QueueMixin(TimerMixin):
         self.task: asyncio.Task = None
         self.on_start_async = True
 
+    def __or__(self, other):
+        assert isinstance(other, Message)
+        if not self.is_alive:
+            return
+        async def _task():
+            await self.queue.put(other)
+        self.create_task(_task())
+        return self
+
     async def _loop(self):
         if self.on_start_async:
             try:
@@ -228,7 +237,7 @@ class HttpMixin:
 
 class SubscribeMixin:
     @classmethod
-    def detect_subscribe_type(cls, text) -> None|ProxyEnum:
+    def detect_subscribe_type(cls, text) -> None | ProxyEnum:
         try:
             json.loads(text)
             return ProxyEnum.SHADOWSOCKS
@@ -242,85 +251,26 @@ class SubscribeMixin:
         return None
 
     @classmethod
-    def decode_shadowsocks_node(
-            cls,
-            item: dict,
-            name = None,
-            node_hash = None,
-            node = None,
-    ) -> NodeSettings:
-        name = name or item['remarks']
-        host = item['server']
-        port = item['server_port']
-        node_hash = node_hash or NodeSettings.generate_hash(name, host, port)
-        node = node or NodeSettings(
-            id=node_hash, 
-            name=name, 
-            proxy=ProxyEnum.SHADOWSOCKS, 
-            host=host, 
-            port=port, 
-            tls=False, 
-            chiper=None, 
-            origin=item, 
-            wrap=None,
-            )
-        return node
-
-    def decode_shadowsocks_nodes(self, text: str) -> list[NodeSettings]:
+    def decode_shadowsocks_nodes(cls, text: str) -> list[WorkingNodeSettings]:
         d = json.loads(text)
         d = addict.Dict(d)
         items = d.configs
-        result = list()
-        for item in items:
-            node = self.decode_shadowsocks_node(
-                item=item,
-            )
-            result.append(node)
+        proxy = ProxyEnum.SHADOWSOCKS
+        result = [WorkingNodeSettings.from_subscribe(proxy, origin) for origin in items]
         return result
 
     @classmethod
-    def decode_vmess_node(
-            cls,
-            item: dict,
-            name=None,
-            node_hash=None,
-            node=None,
-    ) -> NodeSettings:
-        name = name or item['ps']
-        host = item['add']
-        port = item['port']
-        alter_id = item.get('aid')
-        uuid = str(item.get('id')) if item.get('id') else None
-        node_hash = node_hash or NodeSettings.generate_hash(name, host, port)
-        node = node or NodeSettings(
-            id=node_hash, 
-            name=name, 
-            proxy=ProxyEnum.VMESS, 
-            host=host, 
-            port=port, 
-            tls=False, 
-            chiper=None, 
-            alter_id=alter_id,
-            uuid=uuid,
-            origin=item, 
-            wrap=None,
-            )
-        return node
-
-    def decode_vmess_nodes(self, text: str) -> list[NodeSettings]:
+    def decode_vmess_nodes(cls, text: str) -> list[WorkingNodeSettings]:
         vmess_lines = base64.urlsafe_b64decode(text + "=" * (-len(text) % 4)).split()
         config_list = [json.loads(base64.urlsafe_b64decode(line.replace(b"vmess://", b""))) for line in vmess_lines]
-        result = list()
-        for config in config_list:
-            node = self.decode_vmess_node(
-                item=config,
-            )
-            result.append(node)
+        proxy = ProxyEnum.VMESS
+        result = [WorkingNodeSettings.from_subscribe(proxy, origin) for origin in config_list]
         return result
 
 
 class StorageMixin:
     CONFIG_ROOT = '.exhibition'
+    WRITE_LOCK = asyncio.Lock()
 
     @staticmethod
     def working_path() -> str:
@@ -335,8 +285,9 @@ class StorageMixin:
         assert name
         assert body
         path = cls.get_path(name)
-        async with aiofiles.open(path, 'w') as afp:
-            await afp.write(body)
+        async with cls.WRITE_LOCK:
+            async with aiofiles.open(path, 'w') as afp:
+                await afp.write(body)
 
     @classmethod
     async def delete_file(cls, name: str):

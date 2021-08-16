@@ -12,7 +12,7 @@ class Executable extends Component {
         const data = {
             path: currentPath,
         }
-        axios({url: '/interface/executables', data, method: 'delete', timeout: 1000})
+        axios({url: './interface/executables', data, method: 'delete', timeout: 1000})
         .then(({ data }) => {
             this.setState({isDeleted: true, })
         })

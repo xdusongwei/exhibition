@@ -10,15 +10,18 @@ class Message:
     process: asyncio.subprocess.Process = None
     stream: StreamEnum = None
     readline: str = None
-    export: ExportSettings = None
+    export: 'ExportNode' = None
     airport: 'AirportNode' = None
     proxy: 'ProxyNode' = None
     paths: list[str] = None
     executable: 'ExecutableNode' = None
     executables: list['ExecutableNode'] = None
     nodes: dict[str, 'WorkingNode'] = None
+    airports: dict[str, 'AirportNode'] = None
+    custom: CustomNodeSettings = None
     queue: asyncio.Queue = None
     exception: tuple[Exception, list] = None
+    from_timer: bool = False
 
     def __str__(self) -> str:
         return f'<Message {self.action} ' + \
@@ -33,7 +36,10 @@ class Message:
                (f'executable:{self.executable} ' if self.executable is not None else '') + \
                (f'executables:{self.executables} ' if self.executables is not None else '') + \
                (f'nodes:{self.nodes} ' if self.nodes is not None else '') + \
-               (f'queue:{self.queue} ' if self.queue is not None else '') +                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             (f'exception:{self.exception} ' if self.exception is not None else '') + \
+               (f'custom:{self.custom} ' if self.custom is not None else '') + \
+               (f'queue:{self.queue} ' if self.queue is not None else '') + \
+               (f'fromTimer:{self.from_timer} ' if self.from_timer else '') + \
+               (f'exception:{self.exception} ' if self.exception is not None else '') + \
                ' >'
 
     def __repr__(self) -> str:

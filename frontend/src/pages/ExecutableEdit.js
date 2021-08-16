@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import axios from 'axios'
 import { fetchExecutables } from "../actions";
 import { Redirect } from 'react-router-dom'
+import ErrorDetail from '../components/ErrorDetail'
 
 class ExecutableEditPage extends Component {
     state = {
@@ -30,17 +31,13 @@ class ExecutableEditPage extends Component {
             path: currentPath,
             newPath: newPath,
         }
-        axios({url: '/interface/executables', data, method: 'post', timeout: 1000})
+        axios({url: './interface/executables', data, method: 'post', timeout: 1000})
         .then(({ data }) => {
             this.setState({isFinish: true, enableSubmit: true, })
         })
         .catch(data => {
             console.error(data)
-            let error = "服务异常"
-            if(data.response && data.response.data.error){
-                error = data.response.data.error
-            }
-            this.setState({enableSubmit: true, error: error, })
+            this.setState({enableSubmit: true, error: data, })
         });
     }
 
@@ -56,7 +53,7 @@ class ExecutableEditPage extends Component {
         }
 
         if (this.state.isFinish){
-            return <Redirect to={{pathname: "/executable", }} />
+            return <Redirect to={{pathname: "../../executable", }} />
         }
 
         return loading ?
@@ -71,7 +68,7 @@ class ExecutableEditPage extends Component {
                         <div className="mb-3">
                             <label htmlFor="location" className="form-label">位置</label>
                             <input type="input" className="form-control" id="location" defaultValue={item.path} required={true} />
-                            {this.state.error ? <div className="mt-2 alert alert-danger" role="alert">{this.state.error}</div> : null}
+                            <ErrorDetail e={this.state.error} />
                         </div>
                         <div className="mb-3">
                             <button type="submit" className="btn btn-primary" disabled={!this.state.enableSubmit}>保存</button>

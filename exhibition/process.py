@@ -21,6 +21,12 @@ class Process:
     def __repr__(self) -> str:
         return self.__str__()
 
+    @property
+    def pid(self) -> None | int:
+        if self.proc:
+            return self.proc.pid
+        return None
+
     async def start(self, *params):
         if self.proc:
             raise ValueError(f'存在进程')

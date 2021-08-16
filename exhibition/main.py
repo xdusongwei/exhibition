@@ -8,15 +8,31 @@ from exhibition.store import Store
 from exhibition.interface import routes
 
 
-async def on_start(app):
-    args = getattr(app, 'args')
-    loglevel = args.loglevel
+def change_legacy():
+    legacy_gather = asyncio.gather
+    async def gather(*coros_or_futures, loop=None, return_exceptions=False):
+        return await legacy_gather(*coros_or_futures, return_exceptions=return_exceptions)
+    asyncio.gather = gather
+
+
+def locate_web_path():
+    current_path = __file__
+    current_dir = os.path.dirname(current_path)
+    return os.path.join(current_dir, 'www')
+
+
+def setup_log(loglevel):
     handler = logging.StreamHandler(stream=sys.stdout)
     fmt = '%(asctime)s %(levelname)s:%(message)s'
     formatter = logging.Formatter(fmt, datefmt='%m-%d %H:%M:%S')
     handler.setFormatter(formatter)
     logging.getLogger().addHandler(handler)
     logging.getLogger().setLevel(logging.getLevelName(loglevel))
+
+
+async def on_start(app):
+    args = getattr(app, 'args')
+    setup_log(args.loglevel)
 
     store: Store = getattr(app, '_store')
     await store.spawn()
@@ -26,19 +42,6 @@ async def on_shutdown(app):
     store: Store = getattr(app, '_store')
     await store.stop()
     delattr(app, '_store')
-
-
-def change_legacy():
-    legacy_gather = asyncio.gather
-    async def gather(*coros_or_futures, loop=None, return_exceptions=False):
-        return await legacy_gather(*coros_or_futures, return_exceptions=return_exceptions)
-    asyncio.gather = gather
-
-
-def locate_public_path():
-    current_path = __file__
-    current_dir = os.path.dirname(current_path)
-    return os.path.join(current_dir, 'public')
 
 
 def main():
@@ -57,7 +60,7 @@ def main():
     )
     parser.add_argument(
         '--loglevel',
-        default='DEBUG',
+        default='INFO',
         help='日志等级，默认INFO',
     )
     parser.add_argument(
@@ -75,7 +78,7 @@ def main():
     setattr(app, 'args', args)
     app.add_routes(routes)
     app.add_routes([
-        web.static('/', locate_public_path()),
+        web.static('/', locate_web_path()),
     ])
     setattr(app, '_store', store)
     app.on_startup.append(on_start)

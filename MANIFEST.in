@@ -1,1 +1,9 @@
-include exhibition/public/*
+include LICENSE
+include README
+include build-static.sh
+recursive-include exhibition/www *
+include frontend/package.json
+include frontend/package-lock.json
+include frontend/README
+recursive-include frontend/src *
+recursive-include frontend/public *

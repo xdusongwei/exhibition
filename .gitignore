@@ -136,8 +136,4 @@ dmypy.json
 debug_*.py
 
 # static
-exhibition/public/
-
-# frontend
-node_modules/
-package-lock.json
+exhibition/www/

@@ -36,6 +36,14 @@ class ExecutablePage extends Component {
             (
                 <div>
                     <div className="row mt-2">
+                        <div className="col-md-6">
+                            <div className="alert alert-success" role="alert">绿色代表成功分析出软件类型</div>
+                        </div>
+                        <div className="col-md-6">
+                            <div className="alert alert-light" role="alert">白色代表未能分析为已知的软件类型</div>
+                        </div>
+                    </div>
+                    <div className="row mt-2">
                         <div className="col">
                             <div className="btn-group float-end" role="group" aria-label="pageBar">
                                 <Link type="button" className="btn btn-primary ms-2" to="/executable/add">添加</Link>

@@ -9,11 +9,11 @@ from exhibition.process import *
 
 
 class ExecutableNode(QueueMixin):
-    def __init__(self, paths, store_queue: asyncio.Queue) -> None:
+    def __init__(self, paths, store: QueueMixin) -> None:
         super().__init__()
         self.paths = paths or list()
         self.executables = list()
-        self.store_queue = store_queue
+        self.store = store
         self.proc: Process = None
         self.obfs_local_path = None
 
@@ -59,6 +59,9 @@ class ExecutableNode(QueueMixin):
             if 'V2Ray' in text:
                 executable = ExecutableEnum.V2RAY
                 params = ['-version']
+            if 'Xray' in text:
+                executable = ExecutableEnum.XRAY
+                params = ['-version']
             if 'shadowsocks' in text:
                 executable = ExecutableEnum.SHADOWSOCKS
                 obfs_plugin = self.obfs_local_path
@@ -79,6 +82,9 @@ class ExecutableNode(QueueMixin):
             case ExecutableEnum.V2RAY:
                 if group := re.search(r'V2Ray\s(\S+)\s', text).groups():
                     version = group[0]
+            case ExecutableEnum.XRAY:
+                if group := re.search(r'Xray\s(\S+)\s', text).groups():
+                    version = group[0]
             case ExecutableEnum.SHADOWSOCKS:
                 if group := re.search(r'shadowsocks-libev\s(\S+)\s', text).groups():
                     version = group[0]
@@ -97,16 +103,17 @@ class ExecutableNode(QueueMixin):
             except Exception as e:
                 logging.error(f'探测可执行程序 {p} 出错:{e}')
         self.executables = executables
+        logging.info(f'最新检测到的可执行程序:{executables}')
 
     async def on_start(self):
         self.action_timer(ActionEnum.EXECUTABLE_REFRESH, 1 * 60 * 60)
         await self.update_executables()
-        await self.store_queue.put(Message(action=ActionEnum.EXECUTABLE_UPDATED))
+        self.store | Message(action=ActionEnum.EXECUTABLE_UPDATED)
 
     async def on_message(self, message: Message):
         match message.action:
             case ActionEnum.EXECUTABLE_REFRESH:
-                self.action_timer(ActionEnum.EXECUTABLE_REFRESH, 1 * 60 * 60)
+                self.action_timer(ActionEnum.EXECUTABLE_REFRESH, 12 * 60 * 60)
 
         match message.action:
             case ActionEnum.EXECUTABLE_CHANGED:
@@ -115,7 +122,7 @@ class ExecutableNode(QueueMixin):
         match message.action:
             case ActionEnum.EXECUTABLE_REFRESH | ActionEnum.EXECUTABLE_CHANGED:
                 await self.update_executables()
-                await self.store_queue.put(Message(action=ActionEnum.EXECUTABLE_UPDATED))
+                self.store | Message(action=ActionEnum.EXECUTABLE_UPDATED)
 
 
 __all__ = [
