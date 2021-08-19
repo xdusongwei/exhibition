@@ -52,6 +52,7 @@ class V2Ray(ExecutableAbstract):
                                 'flow': export_settings.flow,
                             },
                         ],
+                        'decryption': 'none',
                         'default': {
                             'alterId': export_settings.alter_id,
                             'level': 0,
