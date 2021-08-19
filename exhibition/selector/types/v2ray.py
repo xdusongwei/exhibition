@@ -6,6 +6,7 @@ from exhibition.selector.types.abstract import ExecutableAbstract
 class V2Ray(ExecutableAbstract):
     EXECUTABLE_TYPE = ExecutableEnum.V2RAY
     SUPPORT_INPUT = {
+        ProxyEnum.VLESS,
         ProxyEnum.VMESS,
         ProxyEnum.HTTP,
         ProxyEnum.SOCK5,
