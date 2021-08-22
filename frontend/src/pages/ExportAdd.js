@@ -196,7 +196,6 @@ class ExportAddPage extends Component {
                             <select className="form-select form-control" id="proxy" defaultValue="VMESS" onChange={this.proxyChanged}>
                                 <option value="VMESS">VMess</option>
                                 <option value="VLESS" >VLESS</option>
-                                <option value="TROJAN" >Trojan</option>
                                 <option value="SOCKS5">SOCKS5</option>
                                 <option value="HTTP">HTTP</option>
                             </select>

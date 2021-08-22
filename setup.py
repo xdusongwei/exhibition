@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='exhibition',
+    name='exhibition-proxy',
     version='0.1.0',
     author='宋伟(songwei)',
     author_email='songwei@songwei.io',
