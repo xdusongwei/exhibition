@@ -8,12 +8,12 @@ from exhibition.selector.types.xray import XRay
 class Selector:
     @classmethod
     def working_node(cls, executables: list[Executable], settings: WorkingNodeSettings) -> None | ExecutableAbstract:
-        executable = cls._query_one_executable(executables, ProxyEnum.SOCK5, settings.proxy)
+        executable = cls._query_one_executable(executables, ProxyEnum.SOCKS5, settings.proxy)
         return executable
 
     @classmethod
     def export_node(cls, executables: list[Executable], settings: ExportSettings) -> None | ExecutableAbstract:
-        executable = cls._query_one_executable(executables, settings.proxy, ProxyEnum.SOCK5)
+        executable = cls._query_one_executable(executables, settings.proxy, ProxyEnum.SOCKS5)
         return executable
 
     @classmethod

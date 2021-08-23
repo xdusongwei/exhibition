@@ -55,7 +55,7 @@ class ProxyEnum(enum.Enum):
     VMESS = enum.auto()
     VLESS = enum.auto()
     TROJAN = enum.auto()
-    SOCK5 = enum.auto()
+    SOCKS5 = enum.auto()
     HTTP = enum.auto()
     HTTPS = enum.auto()
 
@@ -218,7 +218,7 @@ class WorkingNodeSettings(BaseNodeSettings):
 
 @dataclass
 class WorkingNodeState:
-    proxy: ProxyEnum = field(default=ProxyEnum.SOCK5)
+    proxy: ProxyEnum = field(default=ProxyEnum.SOCKS5)
     host: str = field(default='127.0.0.1')
     port: int = field(default=None)
     create_timestamp: int = field(default_factory=timestamp)

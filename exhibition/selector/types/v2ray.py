@@ -9,11 +9,11 @@ class V2Ray(ExecutableAbstract):
         ProxyEnum.VLESS,
         ProxyEnum.VMESS,
         ProxyEnum.HTTP,
-        ProxyEnum.SOCK5,
+        ProxyEnum.SOCKS5,
     }
     SUPPORT_OUTPUT = {
         ProxyEnum.VMESS,
-        ProxyEnum.SOCK5,
+        ProxyEnum.SOCKS5,
         ProxyEnum.HTTP,
     }
 
@@ -99,7 +99,7 @@ class V2Ray(ExecutableAbstract):
                         'userLevel': 0,
                     },
                 }
-            case ProxyEnum.SOCK5:
+            case ProxyEnum.SOCKS5:
                 inbound = {
                     'listen': export_settings.host,
                     'port': export_settings.port,
@@ -131,7 +131,7 @@ class V2Ray(ExecutableAbstract):
         ]
         for state, settings in working_settings:
             match state.proxy:
-                case ProxyEnum.SOCK5:
+                case ProxyEnum.SOCKS5:
                     outbound = {
                         'tag': settings.id,
                         'protocol': 'socks',
@@ -188,7 +188,7 @@ class V2Ray(ExecutableAbstract):
             settings: WorkingNodeSettings,
     ):
         match statue.proxy:
-            case ProxyEnum.SOCK5:
+            case ProxyEnum.SOCKS5:
                 inbound = {
                     'listen': statue.host,
                     'port': statue.port,
@@ -278,7 +278,7 @@ class V2Ray(ExecutableAbstract):
                         'sockopt': {},
                     }
                 }
-            case ProxyEnum.SOCK5:
+            case ProxyEnum.SOCKS5:
                 outbound = {
                     'tag': settings.id,
                     'protocol': 'socks',

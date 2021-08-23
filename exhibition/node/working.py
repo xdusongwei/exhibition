@@ -92,7 +92,7 @@ class WorkingNode(QueueMixin, HttpMixin, StorageMixin, PortPoolMixin):
         success_times = 0
         total_times = 3
         response_times = 2
-        assert self.state.proxy == ProxyEnum.SOCK5
+        assert self.state.proxy == ProxyEnum.SOCKS5
         for i in range(total_times):
             try:
                 await asyncio.sleep(2)

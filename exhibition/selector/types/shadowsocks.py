@@ -6,7 +6,7 @@ from exhibition.selector.types.abstract import ExecutableAbstract
 class Shadowsocks(ExecutableAbstract):
     EXECUTABLE_TYPE = ExecutableEnum.SHADOWSOCKS
     SUPPORT_INPUT = {
-        ProxyEnum.SOCK5,
+        ProxyEnum.SOCKS5,
     }
     SUPPORT_OUTPUT = {
         ProxyEnum.SHADOWSOCKS,

@@ -8,11 +8,11 @@ class XRay(V2Ray):
         ProxyEnum.VLESS,
         ProxyEnum.VMESS,
         ProxyEnum.HTTP,
-        ProxyEnum.SOCK5,
+        ProxyEnum.SOCKS5,
     }
     SUPPORT_OUTPUT = {
         ProxyEnum.VMESS,
-        ProxyEnum.SOCK5,
+        ProxyEnum.SOCKS5,
     }
 
     def config_filename(self, name: str) -> str:
