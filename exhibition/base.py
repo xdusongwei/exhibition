@@ -210,7 +210,7 @@ class WorkingNodeSettings(BaseNodeSettings):
         return generate_hash('NA', str(name), str(host), str(port), proxy.name)
 
     def __str__(self) -> str:
-        return f'<WorkingNodeSettings name:"{self.name}" {self.proxy.name}://{self.host}:{self.port} >'
+        return f'<WorkingNodeSettings name:"{self.name}" {self.proxy.name.lower()}://{self.host}:{self.port} >'
 
     def __repr__(self) -> str:
         return self.__str__()

@@ -102,7 +102,10 @@ class ExportNode(QueueMixin, StorageMixin, PortPoolMixin):
                 if re.search(pattern, text):
                     logging.info(f'{self}根据排除机场名正则过滤: {text}')
                     continue
-            for node in airport_nodes[:settings.select_count]:
+            remain_count = settings.select_count
+            for node in airport_nodes:
+                if remain_count < 1:
+                    break
                 text = node.settings.name
                 if pattern := settings.include_working_name_regex:
                     if not re.search(pattern, text):
@@ -115,6 +118,7 @@ class ExportNode(QueueMixin, StorageMixin, PortPoolMixin):
                 if not node.state.speed:
                     continue
                 nodes.append(node)
+                remain_count -= 1
         self.best_nodes = nodes
 
     def remount_reference(self):
