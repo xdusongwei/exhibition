@@ -93,18 +93,24 @@ class ExportNode(QueueMixin, StorageMixin, PortPoolMixin):
             airport = self.airports.get(airport_id)
             if not airport:
                 continue
+            text = airport.settings.name
             if pattern := settings.include_airport_name_regex:
-                if not re.search(pattern, airport.settings.name):
+                if not re.search(pattern, text):
+                    logging.info(f'{self}根据包含机场名正则过滤: {text}')
                     continue
             if pattern := settings.exclude_airport_name_regex:
-                if re.search(pattern, airport.settings.name):
+                if re.search(pattern, text):
+                    logging.info(f'{self}根据排除机场名正则过滤: {text}')
                     continue
             for node in airport_nodes[:settings.select_count]:
+                text = node.settings.name
                 if pattern := settings.include_working_name_regex:
-                    if not re.search(pattern, node.settings.name):
+                    if not re.search(pattern, text):
+                        logging.info(f'{self}根据包含工作节点名正则过滤: {text}')
                         continue
                 if pattern := settings.exclude_working_name_regex:
-                    if re.search(pattern, node.settings.name):
+                    if re.search(pattern, text):
+                        logging.info(f'{self}根据排除工作节点名正则过滤: {text}')
                         continue
                 if not node.state.speed:
                     continue
