@@ -10,6 +10,7 @@ class V2Ray(ExecutableAbstract):
         ProxyEnum.VMESS,
         ProxyEnum.HTTP,
         ProxyEnum.SOCKS5,
+        ProxyEnum.SHADOWSOCKS,
     }
     SUPPORT_OUTPUT = {
         ProxyEnum.VMESS,
@@ -58,30 +59,7 @@ class V2Ray(ExecutableAbstract):
                             'level': 0,
                         },
                     },
-                    'streamSettings': {
-                        'network': network,
-                        'security': export_settings.security,
-                        'tlsSettings': {
-                            'usage': export_settings.usage,
-                            'keyFile': export_settings.key_file,
-                            'certificateFile': export_settings.certificate_file,
-                        },
-                        'tcpSettings': {
-
-                        },
-                        'wsSettings': {
-                            'path': export_settings.path,
-                        } if export_settings.obfuscating == ObfuscatingEnum.WEBSOCKET else None,
-                        'httpSettings': {
-
-                        } if export_settings.obfuscating == ObfuscatingEnum.HTTP2 else None,
-                        'quicSettings': {
-
-                        },
-                        'grpcSettings': {
-
-                        },
-                    }
+                    'streamSettings': self.build_stream_settings(settings=export_settings),
                 }
             case ProxyEnum.HTTP:
                 inbound = {
@@ -116,6 +94,25 @@ class V2Ray(ExecutableAbstract):
                         "udp": False,
                         "userLevel": 0,
                     },
+                }
+            case ProxyEnum.SHADOWSOCKS:
+                inbound = {
+                    'listen': export_settings.host,
+                    'port': export_settings.port,
+                    'protocol': 'shadowsocks',
+                    'tag': export_settings.id,
+                    'settings': {
+                        'clients': [
+                            {
+                                'email': export_settings.id,
+                                'level': 0,
+                                'method': method,
+                                'password': password,
+                            } for method, password in export_settings.account_list or list()
+                        ],
+                        'network': 'tcp,udp',
+                    },
+                    'streamSettings': self.build_stream_settings(settings=export_settings),
                 }
             case _:
                 raise ValueError(f'{self}不支持{export_settings.proxy}作为外露服务协议')
@@ -202,7 +199,6 @@ class V2Ray(ExecutableAbstract):
                 raise ValueError(f'{self}不支持{statue.proxy}作为工作节点协议')
         match settings.proxy:
             case ProxyEnum.VLESS:
-                network = self.obfuscating_to_network(settings)
                 outbound = {
                     'tag': settings.id,
                     'protocol': 'vless',
@@ -222,28 +218,9 @@ class V2Ray(ExecutableAbstract):
                             },
                         ],
                     },
-                    'streamSettings': {
-                        'network': network,
-                        'security': settings.security,
-                        'tlsSettings': {
-                            'usage': settings.usage,
-                            'keyFile': settings.key_file,
-                            'certificateFile': settings.certificate_file,
-                        },
-                        'tcpSettings': {},
-                        'wsSettings': {
-                            'path': settings.path,
-                        } if settings.obfuscating == ObfuscatingEnum.WEBSOCKET else None,
-                        'httpSettings': {
-
-                        } if settings.obfuscating == ObfuscatingEnum.HTTP2 else None,
-                        'quicSettings': {},
-                        'grpcSettings': {},
-                        'sockopt': {},
-                    }
+                    'streamSettings': self.build_stream_settings(settings=settings),
                 }
             case ProxyEnum.VMESS:
-                network = self.obfuscating_to_network(settings)
                 outbound = {
                     'tag': settings.id,
                     'protocol': 'vmess',
@@ -262,21 +239,7 @@ class V2Ray(ExecutableAbstract):
                             },
                         ],
                     },
-                    'streamSettings': {
-                        'network': network,
-                        'security': settings.security,
-                        'tlsSettings': {},
-                        'tcpSettings': {},
-                        'wsSettings': {
-                            'path': settings.path,
-                        } if settings.obfuscating == ObfuscatingEnum.WEBSOCKET else None,
-                        'httpSettings': {
-
-                        } if settings.obfuscating == ObfuscatingEnum.HTTP2 else None,
-                        'quicSettings': {},
-                        'grpcSettings': {},
-                        'sockopt': {},
-                    }
+                    'streamSettings': self.build_stream_settings(settings=settings),
                 }
             case ProxyEnum.SOCKS5:
                 outbound = {
@@ -326,6 +289,33 @@ class V2Ray(ExecutableAbstract):
             ],
         }
         return json.dumps(config, indent=2)
+
+    @classmethod
+    def build_stream_settings(cls, settings: BaseNodeSettings | ExportSettings) -> dict:
+        network = cls.obfuscating_to_network(settings)
+        tls_settings = 'tlsSettings'
+        if settings.security == 'xtls':
+            tls_settings = 'xtlsSettings'
+        return {
+            'network': network,
+            'security': settings.security,
+            tls_settings: {
+                'usage': settings.usage,
+                'keyFile': settings.key_file,
+                'certificateFile': settings.certificate_file,
+            },
+            'tcpSettings': {},
+            'wsSettings': {
+                'path': settings.path,
+            } if settings.obfuscating == ObfuscatingEnum.WEBSOCKET else None,
+            'httpSettings': {
+
+            } if settings.obfuscating == ObfuscatingEnum.HTTP2 else None,
+            'quicSettings': {},
+            'grpcSettings': {},
+            'sockopt': {},
+        }
+
 
     @classmethod
     def obfuscating_to_network(cls, settings: BaseNodeSettings | ExportSettings) -> str:

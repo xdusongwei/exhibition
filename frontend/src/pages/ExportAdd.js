@@ -22,6 +22,9 @@ class ExportAddPage extends Component {
         showCertSecretPath: false,
         showCertPublicPath: false,
         showUsage: false,
+        showMethod: false,
+        tlsValue: 'none',
+        methodValue: 'chacha20-ietf-poly1305',
     }
 
     submit = (event) => {
@@ -69,6 +72,10 @@ class ExportAddPage extends Component {
             const password = elements.password.value
             data.password = password
         }
+        if(elements.method){
+            const method = elements.method.value
+            data.method = method
+        }
         if(elements.tls){
             const security = elements.security.value
             data.security = security
@@ -111,6 +118,7 @@ class ExportAddPage extends Component {
                 showPassword: false,
                 showFlow: false,
                 showTls: true,
+                showMethod: false,
             })
         }
         if(value === 'VLESS'){
@@ -122,6 +130,7 @@ class ExportAddPage extends Component {
                 showPassword: false,
                 showFlow: true,
                 showTls: true,
+                showMethod: false,
             })
         }
         if(value === 'TROJAN'){
@@ -144,6 +153,7 @@ class ExportAddPage extends Component {
                 showPassword: true,
                 showFlow: false,
                 showTls: false,
+                showMethod: false,
             })
         }
         if(value === 'HTTP'){
@@ -155,6 +165,19 @@ class ExportAddPage extends Component {
                 showPassword: true,
                 showFlow: false,
                 showTls: false,
+                showMethod: false,
+            })
+        }
+        if(value === 'SHADOWSOCKS'){
+            this.setState({
+                showAlterId: false,
+                showUuid: false,
+                showObfuscating: true,
+                showUser: false,
+                showPassword: true,
+                showFlow: false,
+                showTls: true,
+                showMethod: true,
             })
         }
         this.setState({currentProxy: value})
@@ -173,6 +196,10 @@ class ExportAddPage extends Component {
 
     tlsChanged = (event) => {
         this.setState({tlsValue: event.target.value})
+    }
+
+    methodChanged = (event) => {
+        this.setState({methodValue: event.target.value})
     }
 
     render() {
@@ -198,6 +225,7 @@ class ExportAddPage extends Component {
                                 <option value="VLESS" >VLESS</option>
                                 <option value="SOCKS5">SOCKS5</option>
                                 <option value="HTTP">HTTP</option>
+                                <option value="SHADOWSOCKS">SHADOWSOCKS</option>
                             </select>
                             <hr/>
                         </div>
@@ -221,9 +249,22 @@ class ExportAddPage extends Component {
                             </div> : null }
                             { state.showPassword ?
                             <div>
-                                <label htmlFor="password" className="form-label">{state.currentProxy === 'TROJAN' ? '*' : null}password</label>
-                                <input type="input" className="form-control" id="password" defaultValue="" required={state.currentProxy === 'TROJAN'}/>
+                                <label htmlFor="password" className="form-label">*password</label>
+                                <input type="input" className="form-control" id="password" defaultValue="" required={true}/>
                             </div> : null }
+                            { state.showMethod ?
+                            <div>
+                                <label htmlFor="method" className="form-label">*method</label>
+                                <select className="form-select form-control" id="method" value={state.methodValue} onChange={this.methodChanged}>
+                                    <option value="none">none</option>
+                                    <option value="plain">plain</option>
+                                    <option value="aes-256-gcm">aes-256-gcm</option>
+                                    <option value="aes-128-gcm">aes-128-gcm</option>
+                                    <option value="chacha20-poly1305">chacha20-poly1305</option>
+                                    <option value="chacha20-ietf-poly1305">chacha20-ietf-poly1305</option>
+                                </select> 
+                            </div> : null 
+                            }
                             { state.showTls ?
                             <div>
                                 <label htmlFor="security" className="form-label">*security</label>

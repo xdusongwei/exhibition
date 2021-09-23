@@ -333,15 +333,31 @@ class ExportNodeView(ApiView):
         include_working_name_regex = args.get('includeWorkingNameRegex')
         exclude_airport_name_regex = args.get('excludeAirportNameRegex')
         exclude_working_name_regex = args.get('excludeWorkingNameRegex')
+        method = args.get('method')
         user = args.get('user')
         password = args.get('password')
-        if (not user and password) or (user and not password):
-            return web.json_response(
-                data={
-                    'error': '需要同时填写用户密码',
-                },
-                status=400,
-            )
+        account_list = None
+        match proxy:
+            case ProxyEnum.SOCKS5 | ProxyEnum.HTTP:
+                if (not user and password) or (user and not password):
+                    return web.json_response(
+                        data={
+                            'error': '需要同时填写用户密码',
+                        },
+                        status=400,
+                    )
+                else:
+                    account_list = [[user, password, ], ]
+            case ProxyEnum.SHADOWSOCKS:
+                if (not method and password) or (method and not password):
+                    return web.json_response(
+                        data={
+                            'error': '需要同时填写method和密码',
+                        },
+                        status=400,
+                    )
+                else:
+                    account_list = [[method, password, ], ]
 
         export_id = generate_hash('EP', uuid4().hex)
         settings = ExportSettings(
@@ -364,7 +380,7 @@ class ExportNodeView(ApiView):
             include_working_name_regex=include_working_name_regex,
             exclude_airport_name_regex=exclude_airport_name_regex,
             exclude_working_name_regex=exclude_working_name_regex,
-            account_list=[[user, password, ], ] if user else None,
+            account_list=account_list,
         )
         node = ExportNode(settings=settings, config_settings=lambda :self.store.settings)
         message = Message(action=ActionEnum.EXPORT_UPDATE, export=node)

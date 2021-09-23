@@ -9,6 +9,7 @@ class XRay(V2Ray):
         ProxyEnum.VMESS,
         ProxyEnum.HTTP,
         ProxyEnum.SOCKS5,
+        ProxyEnum.SHADOWSOCKS,
     }
     SUPPORT_OUTPUT = {
         ProxyEnum.VMESS,
