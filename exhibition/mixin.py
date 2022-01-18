@@ -289,7 +289,9 @@ class SubscribeMixin:
                     'plugin_opts': plugin_opts,
                     'timeout': 5,
                 }
-                result.append(origin)
+                proxy = ProxyEnum.SHADOWSOCKS
+                settings = WorkingNodeSettings.from_subscribe(proxy, origin)
+                result.append(settings)
         except Exception:
             pass
         return result
