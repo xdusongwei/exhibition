@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='exhibition-proxy',
-    version='0.1.0',
+    version='0.1.1',
     author='宋伟(songwei)',
     author_email='songwei@songwei.io',
     description='',
@@ -24,5 +24,6 @@ setup(
         'base58',
         'toml',
         'xxhash',
+        'yarl',
     ],
 )

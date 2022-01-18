@@ -5,6 +5,7 @@ import asyncio
 import logging
 import traceback
 from pathlib import Path
+import yarl
 import addict
 import aiohttp
 import aiofiles
@@ -238,11 +239,10 @@ class HttpMixin:
 class SubscribeMixin:
     @classmethod
     def detect_subscribe_type(cls, text) -> None | ProxyEnum:
-        try:
-            json.loads(text)
+        if cls._decode_shadowsocks_config(text=text):
             return ProxyEnum.SHADOWSOCKS
-        except Exception:
-            pass
+        if cls._decode_sip002_format(text=text):
+            return ProxyEnum.SHADOWSOCKS
         try:
             base64.urlsafe_b64decode(text + "=" * (-len(text) % 4)).split()
             return ProxyEnum.VMESS
@@ -251,13 +251,56 @@ class SubscribeMixin:
         return None
 
     @classmethod
-    def decode_shadowsocks_nodes(cls, text: str) -> list[WorkingNodeSettings]:
-        d = json.loads(text)
-        d = addict.Dict(d)
-        items = d.configs
-        proxy = ProxyEnum.SHADOWSOCKS
-        result = [WorkingNodeSettings.from_subscribe(proxy, origin) for origin in items]
+    def _decode_shadowsocks_config(cls, text: str) -> list[WorkingNodeSettings]:
+        try:
+            d = json.loads(text)
+            d = addict.Dict(d)
+            items = d.configs
+            proxy = ProxyEnum.SHADOWSOCKS
+            result = [WorkingNodeSettings.from_subscribe(proxy, origin) for origin in items]
+            return result
+        except Exception:
+            return list()
+
+    @classmethod
+    def _decode_sip002_format(cls, text: str) -> list[WorkingNodeSettings]:
+        result = list()
+        try:
+            items = base64.urlsafe_b64decode(text + "=" * (-len(text) % 4)).split()
+            items = [item for item in items if item]
+            for item in items:
+                url = yarl.URL(item.decode('utf8'))
+                if url.scheme != 'ss':
+                    break
+                user = url.user
+                user = base64.urlsafe_b64decode(user + "=" * (-len(user) % 4)).decode('utf8')
+                method, password = user.split(':')
+                remarks = url.fragment
+                plugin_parts = url.query.get('plugin').split(';')
+                plugin = plugin_parts[0]
+                plugin_opts = ';'.join(plugin_parts[1:])
+                origin = {
+                    'server': url.host,
+                    'server_port': int(url.port),
+                    'password': password,
+                    'method': method,
+                    'remarks': remarks,
+                    'plugin': plugin,
+                    'plugin_opts': plugin_opts,
+                    'timeout': 5,
+                }
+                result.append(origin)
+        except Exception:
+            pass
         return result
+
+    @classmethod
+    def decode_shadowsocks_nodes(cls, text: str) -> list[WorkingNodeSettings]:
+        if nodes := cls._decode_shadowsocks_config(text=text):
+            return nodes
+        if nodes := cls._decode_sip002_format(text=text):
+            return nodes
+        return list()
 
     @classmethod
     def decode_vmess_nodes(cls, text: str) -> list[WorkingNodeSettings]:
