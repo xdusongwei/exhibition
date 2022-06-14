@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import ErrorDetail from '../components/ErrorDetail'
 
 class ExecutableAddPage extends Component {
@@ -29,7 +29,7 @@ class ExecutableAddPage extends Component {
 
     render() {
         if (this.state.isFinish){
-            return <Redirect to={{pathname: "../executable", }} />
+            return <Navigate to={{pathname: "../executable", }} />
         }
 
         return <form onSubmit={this.submit}>

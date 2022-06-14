@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { connect } from 'react-redux'
 import axios from 'axios'
 import { fetchExecutables } from "../actions";
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import ErrorDetail from '../components/ErrorDetail'
 
 class ExecutableEditPage extends Component {
@@ -53,7 +53,7 @@ class ExecutableEditPage extends Component {
         }
 
         if (this.state.isFinish){
-            return <Redirect to={{pathname: "../../executable", }} />
+            return <Navigate to={{pathname: "../../executable", }} />
         }
 
         return loading ?

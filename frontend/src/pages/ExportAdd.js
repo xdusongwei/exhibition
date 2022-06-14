@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { v4 as uuidv4 } from 'uuid';
 import ErrorDetail from '../components/ErrorDetail'
 
@@ -206,7 +206,7 @@ class ExportAddPage extends Component {
         const state = this.state
 
         if (state.isFinish){
-            return <Redirect to={{pathname: '../export', }} />
+            return <Navigate to={{pathname: '../export', }} />
         }
 
         return <form onSubmit={this.submit}>

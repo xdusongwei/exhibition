@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import ErrorDetail from '../components/ErrorDetail'
 
 class AirportAddPage extends Component {
@@ -33,7 +33,7 @@ class AirportAddPage extends Component {
 
     render() {
         if (this.state.isFinish){
-            return <Redirect to={{pathname: "../airport", }} />
+            return <Navigate to={{pathname: "../airport", }} />
         }
 
         return <form onSubmit={this.submit}>

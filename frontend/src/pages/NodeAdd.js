@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import ErrorDetail from '../components/ErrorDetail'
 
 class NodeAddPage extends Component {
@@ -210,7 +210,7 @@ class NodeAddPage extends Component {
         const state = this.state
 
         if (state.isFinish){
-            return <Redirect to={{pathname: '../node', }} />
+            return <Navigate to={{pathname: '../node', }} />
         }
 
         return <form onSubmit={this.submit}>

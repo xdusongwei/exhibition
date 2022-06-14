@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import axios from 'axios'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import ErrorDetail from '../components/ErrorDetail'
 
 class SettingsPage extends Component {
@@ -79,7 +79,7 @@ class SettingsPage extends Component {
         const state = this.state
 
         if (state.isFinish){
-            return <Redirect to={{pathname: '../', }} />
+            return <Navigate to={{pathname: '../', }} />
         }
 
         return <form onSubmit={this.submit}>
