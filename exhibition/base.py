@@ -187,8 +187,9 @@ class WorkingNodeSettings(BaseNodeSettings):
             case ProxyEnum.VMESS:
                 name = origin['ps']
                 host = origin['add']
-                port = origin['port']
-                alter_id = origin.get('aid')
+                port = int(origin['port'])
+                aid = origin.get('aid')
+                alter_id = int(aid) if aid else 0
                 uuid = str(origin.get('id')) if origin.get('id') else None
                 node_hash = WorkingNodeSettings.generate_hash(name, host, port, proxy)
                 settings = WorkingNodeSettings(
