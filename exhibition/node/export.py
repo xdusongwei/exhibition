@@ -117,6 +117,10 @@ class ExportNode(QueueMixin, StorageMixin, PortPoolMixin):
                         continue
                 if not node.state.speed:
                     continue
+                if not node.state.latency:
+                    continue
+                if node.state.latency > settings.latency_limit:
+                    continue
                 nodes.append(node)
                 remain_count -= 1
         self.best_nodes = nodes

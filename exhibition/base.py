@@ -269,6 +269,7 @@ class ExportSettings:
     exclude_airport_name_regex: str = field(default=None)
     exclude_working_name_regex: str = field(default=None)
     account_list: list[list[str]] = field(default=None)
+    latency_limit: int = field(default=1000)
 
 
 @dataclass
