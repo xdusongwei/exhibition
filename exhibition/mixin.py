@@ -276,9 +276,12 @@ class SubscribeMixin:
                 user = base64.urlsafe_b64decode(user + "=" * (-len(user) % 4)).decode('utf8')
                 method, password = user.split(':')
                 remarks = url.fragment
-                plugin_parts = url.query.get('plugin').split(';')
-                plugin = plugin_parts[0]
-                plugin_opts = ';'.join(plugin_parts[1:])
+                plugin_parts = url.query.get('plugin', '').split(';')
+                plugin = None
+                plugin_opts = None
+                if plugin_parts:
+                    plugin = plugin_parts[0]
+                    plugin_opts = ';'.join(plugin_parts[1:])
                 origin = {
                     'server': url.host,
                     'server_port': int(url.port),
